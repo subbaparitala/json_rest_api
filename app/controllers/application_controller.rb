@@ -1,31 +1,32 @@
 class ApplicationController < ActionController::API
-  private
-  def check_header
-    if ['POST','PUT','PATCH'].include? request.method
-      if request.content_type != "application/vnd.api+json"
-        head 406 and return
-      end
-    end
-  end
-
-  def validate_type
-    if params['data'] && params['data']['type']
-      if params['data']['type'] == params[:controller]
-        return true
-      end
-    end
-    head 409 and return
-  end
-
-  def validate_user
-    token = request.headers["X-Api-Key"]
-    head 403 and return unless token
-    user = User.find_by token: token
-    head 403 and return unless user
-  end
+  include ActionController::HttpAuthentication::Token::ControllerMethods
   
-  def render_error(resource, status)
-    render json: resource, status: status, adapter: :json_api,
-           serializer: ActiveModel::Serializer::ErrorSerializer
+  def require_login
+    authenticate_token || render_unauthorized("Access denied")
   end
+
+  def current_user
+    @current_user ||= authenticate_token
+  end
+
+  protected
+
+  def render_unauthorized(message)
+    errors = { errors: [ { detail: message } ] }
+    render json: errors, status: :unauthorized
+  end
+
+  private
+
+  def authenticate_token
+    authenticate_with_http_token do |token, options|
+      if user = User.with_unexpired_token(token, 2.days.ago)
+        # Compare the tokens in a time-constant manner, to mitigate timing attacks.
+        ActiveSupport::SecurityUtils.secure_compare(
+                        ::Digest::SHA256.hexdigest(token),
+                        ::Digest::SHA256.hexdigest(user.token))
+        user
+      end
+    end
+  end 
 end
