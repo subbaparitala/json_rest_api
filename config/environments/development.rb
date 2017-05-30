@@ -36,6 +36,11 @@ Rails.application.configure do
 
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
+   
+  Rails.application.routes.default_url_options = {
+  host: 'localhost',
+  port: 3000
+  }
 
 
   # Raises error for missing translations
