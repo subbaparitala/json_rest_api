@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
-  before_action :require_login
-  
+  before_action :set_user, only: [:show, :update, :destroy]
+  before_action :require_login, only: [:show, :update, :destroy]
+
   def index
     users = User.all
     render json: users
@@ -15,7 +16,7 @@ class UsersController < ApplicationController
     if user.save
       render json: user, status: :created
     else
-      render_error(user, :unprocessable_entity)
+      render json: user.errors, status: :unprocessable_entity
     end
   end
 
@@ -33,6 +34,7 @@ class UsersController < ApplicationController
   end
 
   private
+
   def set_user
     begin
       @user = User.find params[:id]
@@ -44,6 +46,6 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-  end
+      params.require(:user).permit(:name, :username, :password)
+    end
 end
