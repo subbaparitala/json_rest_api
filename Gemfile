@@ -35,8 +35,6 @@ gem 'net-ssh'
 
 gem 'responders'
 
-gem 'redis-throttle', git: 'git://github.com/lelylan/redis-throttle.git'
-
 gem "will_paginate"
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
