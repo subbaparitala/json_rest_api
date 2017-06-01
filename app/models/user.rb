@@ -5,7 +5,6 @@ class User < ApplicationRecord
 
   validates :username, presence: true
 
-  # This method is not available in has_secure_token
   def self.valid_login?(username, password)
     user = find_by(username: username)
     if user && user.authenticate(password)

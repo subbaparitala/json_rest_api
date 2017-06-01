@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   include ActionController::HttpAuthentication::Token::ControllerMethods
-
+  include ActionController::MimeResponds
+  
   def require_login
     authenticate_token || render_unauthorized("Access denied")
   end
@@ -22,7 +23,7 @@ class ApplicationController < ActionController::API
     render json: resource, status: status, adapter: :json_api,
            serializer: ActiveModel::Serializer::ErrorSerializer
   end
-  
+
   def authenticate_token
     authenticate_with_http_token do |token, options|
       if user = User.with_unexpired_token(token, 2.days.ago)

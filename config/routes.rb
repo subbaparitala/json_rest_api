@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
-  resources :users
-  resources :posts
+  resources :users do
+    resources :posts
+  end
   
   scope :format => true, :constraints => { :format => 'json' } do
     post   "/login"       => "sessions#create"
