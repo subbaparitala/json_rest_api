@@ -2,6 +2,9 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :update, :destroy]
   before_action :require_login, only: [:update, :destroy]
 
+  def homepage 
+    render text: "Hello this users homepage"
+  end
   def index
     users = User.all.paginate(page: params[:page], per_page: 20)
     render json: users
